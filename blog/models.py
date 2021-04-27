@@ -7,7 +7,8 @@ from django.contrib.auth.models import User
 
 class PostQuerySet(models.QuerySet):
     def popular(self):
-        popular_posts = self.annotate(likes_count=Count('likes')).order_by('-likes_count')
+        popular_posts = self.annotate(likes_count=Count('likes')).\
+            order_by('-likes_count')
         return popular_posts
 
     def fetch_with_comments_count(self):
@@ -24,7 +25,8 @@ class PostQuerySet(models.QuerySet):
 
 class TagQuerySet(models.QuerySet):
     def popular(self):
-        popular_tags = self.annotate(posts_count=Count('posts')).order_by('-posts_count')
+        popular_tags = self.annotate(posts_count=Count('posts')).\
+            order_by('-posts_count')
         return popular_tags
 
 
