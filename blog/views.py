@@ -33,15 +33,11 @@ def index(request):
 
     most_popular_posts = Post.objects.popular().\
         prefetch_related('author')[:5].\
-        prefetch_related(Prefetch('tags',
-                                  Tag.objects.annotate(
-                                      posts_count=Count('posts')))).\
+        prefetch_tags().\
         fetch_with_comments_count()
 
     fresh_posts = all_posts.order_by('-published_at').\
-        prefetch_related(Prefetch('tags',
-                         Tag.objects.annotate(posts_count=Count('posts')))).\
-        fetch_with_comments_count()
+        prefetch_tags().fetch_with_comments_count()
     most_fresh_posts = fresh_posts[:5]
 
     most_popular_tags = Tag.objects.popular()[:5]
@@ -88,11 +84,8 @@ def post_detail(request, slug):
     }
 
     most_popular_tags = Tag.objects.popular()[:5]
-    prefetch_tags = Prefetch('tags', Tag.objects.annotate(
-                                      posts_count=Count('posts')))
     most_popular_posts = Post.objects.popular()[:5].\
-        prefetch_related(prefetch_tags).\
-        prefetch_related('author').fetch_with_comments_count()
+        prefetch_tags().prefetch_related('author').fetch_with_comments_count()
 
     context = {
         'post': serialized_post,
@@ -110,12 +103,10 @@ def tag_filter(request, tag_title):
     except ObjectDoesNotExist:
         raise Http404("Page does not exist.")
     most_popular_tags = Tag.objects.popular()[:5]
-    prefetch_tags = Prefetch('tags', Tag.objects.annotate(
-        posts_count=Count('posts')))
     most_popular_posts = Post.objects.popular()[:5].\
-        prefetch_related('author').prefetch_related(prefetch_tags).\
+        prefetch_related('author').prefetch_tags().\
         fetch_with_comments_count()
-    related_posts = tag.posts.prefetch_related(prefetch_tags).\
+    related_posts = tag.posts.prefetch_tags().\
         prefetch_related('author').fetch_with_comments_count()
 
     context = {
