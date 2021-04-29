@@ -3,11 +3,11 @@ from blog.models import Post, Tag, Comment
 
 
 class PostAdmin(admin.ModelAdmin):
-    raw_id_fields = ['likes']
+    raw_id_fields = ["likes"]
 
 
 class CommentAdmin(admin.ModelAdmin):
-    raw_id_fields = ['author']
+    raw_id_fields = ["author"]
 
 
 admin.site.register(Post, PostAdmin)
