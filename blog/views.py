@@ -2,6 +2,8 @@ from django.db.models.query import Prefetch
 from django.shortcuts import render
 from blog.models import Comment, Post, Tag
 from django.db.models import Count
+from django.core.exceptions import ObjectDoesNotExist
+from django.http import Http404
 
 
 def serialize_post(post):
@@ -56,7 +58,10 @@ def index(request):
 
 
 def post_detail(request, slug):
-    post = Post.objects.get(slug=slug)
+    try:
+        post = Post.objects.get(slug=slug)
+    except ObjectDoesNotExist:
+        raise Http404("Page does not exist.")
     comments = Comment.objects.filter(post=post).prefetch_related('author')
     serialized_comments = []
     for comment in comments:
@@ -100,7 +105,10 @@ def post_detail(request, slug):
 
 
 def tag_filter(request, tag_title):
-    tag = Tag.objects.get(title=tag_title)
+    try:
+        tag = Tag.objects.get(title=tag_title)
+    except ObjectDoesNotExist:
+        raise Http404("Page does not exist.")
     most_popular_tags = Tag.objects.popular()[:5]
     prefetch_tags = Prefetch('tags', Tag.objects.annotate(
         posts_count=Count('posts')))
